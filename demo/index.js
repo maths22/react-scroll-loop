@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 import querystring from 'querystring';
 import ScollLoop from '../src/scrollLoop';
 
-import './index.css';
-
 const query = querystring.parse(window.location.search.slice(1));
 
 // generate slide panes
@@ -20,10 +18,10 @@ const paneNodes = Array.apply(null, Array(numberOfSlides)).map((_, i) => {
 // change Swipe.js options by query params
 const startSlide = parseInt(query.startSlide, 10) || 0;
 const swipeOptions = {
-  auto: parseInt(query.auto, 10) || 0,
+  auto: parseInt(query.auto, 10) || 1,
   speed: parseInt(query.speed, 10) || 2000,
   minSpeed: parseInt(query.minSpeed, 10) || 20,
-  height: parseInt(query.height, 10) || 200,
+  height: parseInt(query.height, 10) || 1000,
   transitionEnd() {
     console.log('ended transition');
   }

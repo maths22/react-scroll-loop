@@ -1,6 +1,6 @@
 {
   "name": "react-scroll-loop",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "scroll from bottom to top by loop",
   "homepage": "https://github.com/qilovehua/react-scroll-loop",
   "keywords": [
@@ -15,11 +15,13 @@
     "type": "git",
     "url": "git://github.com/qilovehua/react-scroll-loop.git"
   },
-  "main": "dist/react-scroll-loop.min.js",
+  "main": "lib/scrollLoop",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "load-styles": "^2.0.0"
+  },
   "peerDependencies": {
-    "react": "^15.5.0"
+    "react": "^16.6.0"
   },
   "devDependencies": {
     "ava": "^0.13.0",
@@ -28,6 +30,7 @@
     "babel-eslint": "^6.1.2",
     "babel-loader": "^6.2.5",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-import-css": "^0.1.6",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.11.1",
@@ -47,18 +50,22 @@
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.2.2",
     "mocha": "^2.4.5",
-    "react": "^15.3.1",
-    "react-dom": "^15.3.1",
+    "react": "^16.6",
+    "react-dom": "^16.6",
     "sinon": "^1.17.3",
     "style-loader": "^0.13.1",
     "uglify-js": "^2.7.3",
     "webpack": "^1.13.2",
+    "webpack-dev-server": "^1",
     "webpack-umd-external": "^1.0.2"
   },
   "scripts": {
-    "build": "npm run build-demo && npm run build-prod",
+    "build": "babel src --out-dir lib",
+    "build:watch": "babel src --watch --out-dir lib",
+    "build-all": "npm run build-demo && npm run build-prod",
     "build-demo": "NODE_ENV=development webpack --config webpack.demo.config --colors",
     "build-prod": "NODE_ENV=production webpack --config webpack.config --progress --colors -p",
+    "start": "webpack-dev-server  --config webpack.demo.config --mode development",
     "lint": "eslint ./src",
     "lint-dev": "eslint --fix ./src",
     "test": "echo \"Comming soon ;)\" && exit 0"

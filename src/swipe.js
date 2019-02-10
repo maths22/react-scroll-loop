@@ -20,6 +20,16 @@
     var noop = function () {}; // simple no operation function
     var offloadFn = function (fn) {setTimeout(fn || noop, 0);}; // offload a functions execution
 
+    function makeid() {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    
+      for (var i = 0; i < 5; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+      return text;
+    }
+
     // quit if no root element
     if (!container) {
       return;
@@ -35,6 +45,9 @@
     var minSpeed = options.minSpeed || 20;
     var height = options.height || 0;
     var delay = options.auto || 0;
+    var awaitEnd = -1;
+    var id = makeid();
+    var awaitingTransitionEnd = new Set();
 
     function setup() {
       // cache slides
@@ -54,14 +67,10 @@
         var slide = slides[pos];
 
         slide.style.height = height + 'px';
-        slide.setAttribute('data-index', pos);
+        slide.setAttribute('data-index', id + '-' + pos);
 
         // slide.style.top = (height) + 'px';
-        if (pos === 0) {
-          move(pos, 0, 0);
-        } else {
-          move(pos, height, 0);
-        }
+        move(pos, height * pos, 0);
       }
 
       container.style.visibility = 'visible';
@@ -73,7 +82,12 @@
 
     function slide(to) {
       move(to, -height, slideSpeed || speed);
-      move(to + 1, 0, slideSpeed || speed);
+      awaitingTransitionEnd.add(to);
+      const count = slides.length;
+      for (let i = 1; i < count; i++) {
+        awaitingTransitionEnd.add(circle(to + i));
+        move(circle(to + i), height * (i - 1), slideSpeed || speed);
+      }
       offloadFn(options.callback && options.callback(index, slides[index]));
     }
 
@@ -83,23 +97,35 @@
     }
 
     function move(to, dist, speed) {
+      // console.log("to: " + to + " dist: " + dist)
       translate(to, dist, speed);
       // slidePos[index] = dist;
     }
 
     function translate(to, dist, speed) {
-      var slide = element.children[to - index];
+      var slide = element.children[circle(to - index)];
       var style = slide && slide.style;
 
       if (!style) {
         return;
       }
 
-      style.webkitTransitionDuration = speed + 'ms';
-      style.MozTransitionDuration = speed + 'ms';
-      style.msTransitionDuration = speed + 'ms';
-      style.OTransitionDuration = speed + 'ms';
-      style.transitionDuration = speed + 'ms';
+      // console.log(to + "," + index)
+      if(circle(to - index) != circle(-1)) {
+        style.webkitTransitionDuration = speed + 'ms';
+        style.MozTransitionDuration = speed + 'ms';
+        style.msTransitionDuration = speed + 'ms';
+        style.OTransitionDuration = speed + 'ms';
+        style.transitionDuration = speed + 'ms';
+      } else {
+        // console.log(to);
+        awaitingTransitionEnd.delete(to);
+        style.webkitTransitionDuration = 0 + 'ms';
+        style.MozTransitionDuration = 0 + 'ms';
+        style.msTransitionDuration = 0 + 'ms';
+        style.OTransitionDuration = 0 + 'ms';
+        style.transitionDuration = 0 + 'ms';
+      }
       style.webkitTransform = 'translate3d(0, ' + dist + 'px, 0)';
       // style.webkitTransform = 'translate3d(0, ' + dist + ' px, 0)';
       // style.top = dist + 'px';
@@ -136,17 +162,23 @@
         }
       },
       transitionEnd: function (event) {
-        if (parseInt(event.target.getAttribute('data-index'), 10) == circle(index + 1)) {
-          var prev = element.children[0];
-
-          // prev.style.top = height + 'px';
-          prev.style.webkitTransform = 'translate3d(0, ' + height + 'px, 0';
-          element.append(prev);
-          index = circle(index + 1);
-          if (delay) {
-            begin();
+        const evtTgt = event.target.getAttribute('data-index').split('-');
+        if(evtTgt[0] == id) {
+          awaitingTransitionEnd.delete(parseInt(evtTgt[1], 10));
+          // console.log(awaitingTransitionEnd)
+          if (awaitingTransitionEnd.size == 0) {
+            var prev = element.children[0];
+  
+            // prev.style.top = height + 'px';
+            // prev.style.webkitTransform = 'translate3d(0, ' + height + 'px, 0';
+            element.append(prev);
+            index = circle(index + 1);
+            if (delay) {
+              begin();
+            }
           }
         }
+        
       }
     };
 

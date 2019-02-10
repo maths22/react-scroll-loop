@@ -1,7 +1,7 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import Swipe from './swipe';
 
-import './style.css';
+import styles from './style.css';
 
 class ScrollLoop extends Component {
 
@@ -10,11 +10,11 @@ class ScrollLoop extends Component {
     this.reset = false;
   }
 
-  componentDidMount() {
+  setContainerRef = (ref) => {
     const {speed, minSpeed = 10, auto = 1, transitionEnd} = this.props;
     var swipeOptions = {speed, minSpeed, transitionEnd, auto};
 
-    this.swipe = Swipe(this.refs.container, swipeOptions);
+    this.swipe = Swipe(ref, swipeOptions);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -43,8 +43,8 @@ class ScrollLoop extends Component {
     const {height = 200, id, className, children, style} = this.props;
 
     return (
-        <div ref="container" id={id} className={`react-swipe-container ${className}`} style={{height: height + 'px', ...style}}>
-            <div className="swipe-wrap">
+        <div ref={this.setContainerRef} id={id} className={`${styles.container} ${className}`} style={{height: height + 'px', ...style}}>
+            <div className={styles.swipeWrap}>
                 {React.Children.map(children, (child) => {
                   if (!child) {
                     return null;
@@ -52,7 +52,7 @@ class ScrollLoop extends Component {
 
                   const childStyle = child.props.style ? child.props.style : {};
 
-                  return React.cloneElement(child, {style: childStyle});
+                  return React.cloneElement(child, {style: childStyle, className: child.props.className + ' ' + styles.itemWrap});
                 })}
                 {
                   children && children.length === 2 && React.Children.map(children, (child) => {
@@ -62,23 +62,12 @@ class ScrollLoop extends Component {
 
                     const childStyle = child.props.style ? child.props.style : {};
 
-                    return React.cloneElement(child, {style: childStyle});
+                    return React.cloneElement(child, {style: childStyle, className: child.props.className + ' ' + styles.itemWrap});
                   })
                 }
             </div>
         </div>
     );
-  }
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  ScrollLoop.PropTypes = {
-    speed: PropTypes.number,
-    auto: PropTypes.number,
-    height: PropTypes.number.isRequired,
-    transitionEnd: PropTypes.func,
-    id: PropTypes.string,
-    className: PropTypes.string
   }
 }
 

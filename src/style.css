@@ -1,10 +1,10 @@
-.react-swipe-container {
+.container {
   overflow: hidden;
 }
-.swipe-wrap {
+.swipeWrap {
   position: relative;
 }
-.swipe-wrap::after {
+.swipeWrap::after {
   content: '';
   display: block;
   clear: both;

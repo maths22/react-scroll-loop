@@ -3,3 +3,5 @@ node_modules
 *.log
 
 demo/bundle.min.js.map
+
+lib
